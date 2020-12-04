@@ -13,7 +13,9 @@ use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
 use WyriHaximus\Parallel\Outcome;
 use WyriHaximus\Parallel\Runtime;
 
+use function iterator_to_array;
 use function Safe\sleep;
+use function trigger_error;
 
 use const WyriHaximus\Constants\ComposerAutoloader\LOCATION;
 
@@ -99,5 +101,25 @@ final class RuntimeTest extends AsyncTestCase
 
         self::assertInstanceOf(Future::class, $future);
         $future->value();
+    }
+
+    /**
+     * @test
+     */
+    public function error(): void
+    {
+        $runtime = new Runtime(LOCATION);
+        $future  = $runtime->run(static function (): string {
+            trigger_error('Error! Error! Error!');
+
+            return 'yay';
+        });
+
+        self::assertInstanceOf(Future::class, $future);
+        $outcome = $future->value();
+        self::assertInstanceOf(Outcome::class, $outcome);
+        self::assertSame('yay', $outcome->result());
+        $errors = iterator_to_array($outcome->errors()); /** @phpstan-ignore-line */
+        self::assertCount(1, $errors);
     }
 }

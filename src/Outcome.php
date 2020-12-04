@@ -9,6 +9,9 @@ final class Outcome
     /** @var mixed */
     private $result;
 
+    /** @var array<mixed> */
+    private array $errors = [];
+
     /**
      * @param mixed $result
      */
@@ -26,5 +29,24 @@ final class Outcome
     public function result()
     {
         return $this->result;
+    }
+
+    /**
+     * @param array<mixed> $error
+     */
+    public function withError(array $error): Outcome
+    {
+        $clone           = clone $this;
+        $clone->errors[] = $error;
+
+        return $clone;
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public function errors(): iterable
+    {
+        yield from $this->errors;
     }
 }
