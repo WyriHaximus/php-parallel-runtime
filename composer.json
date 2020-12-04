@@ -10,7 +10,8 @@
   ],
   "require": {
     "php": "^7.4",
-    "ext-parallel": "^1"
+    "ext-parallel": "^1",
+    "wyrihaximus/constants": "^1.6"
   },
   "require-dev": {
     "thecodingmachine/safe": "^1.3",

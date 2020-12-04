@@ -10,9 +10,12 @@ use parallel\Runtime\Error\Closed;
 use Throwable;
 use TypeError;
 use WyriHaximus\AsyncTestUtilities\AsyncTestCase;
+use WyriHaximus\Parallel\Outcome;
 use WyriHaximus\Parallel\Runtime;
 
 use function Safe\sleep;
+
+use const WyriHaximus\Constants\ComposerAutoloader\LOCATION;
 
 final class RuntimeTest extends AsyncTestCase
 {
@@ -21,7 +24,7 @@ final class RuntimeTest extends AsyncTestCase
      */
     public function success(): void
     {
-        $runtime = new Runtime();
+        $runtime = new Runtime(LOCATION);
         $future  = $runtime->run(static function (): string {
             return 'yay';
         });
@@ -29,7 +32,9 @@ final class RuntimeTest extends AsyncTestCase
         sleep(1);
 
         self::assertInstanceOf(Future::class, $future);
-        self::assertSame('yay', $future->value());
+        $outcome = $future->value();
+        self::assertInstanceOf(Outcome::class, $outcome);
+        self::assertSame('yay', $outcome->result());
     }
 
     /**
@@ -39,7 +44,7 @@ final class RuntimeTest extends AsyncTestCase
     {
         self::expectException(Closed::class);
 
-        $runtime = new Runtime();
+        $runtime = new Runtime(LOCATION);
         $runtime->close();
         $runtime->run(static function (): string {
             return 'yay';
@@ -53,7 +58,7 @@ final class RuntimeTest extends AsyncTestCase
     {
         self::expectException(Closed::class);
 
-        $runtime = new Runtime();
+        $runtime = new Runtime(LOCATION);
         $runtime->kill();
         $runtime->run(static function (): string {
             return 'yay';
@@ -68,7 +73,7 @@ final class RuntimeTest extends AsyncTestCase
         self::expectException(Throwable::class);
         self::expectExceptionMessage('nay');
 
-        $runtime = new Runtime();
+        $runtime = new Runtime(LOCATION);
         $future  = $runtime->run(static function (): void {
             /** @phpstan-ignore-next-line */
             throw new Exception('nay');
@@ -86,7 +91,7 @@ final class RuntimeTest extends AsyncTestCase
         self::expectException(TypeError::class);
         self::expectExceptionMessageMatches('#string, int returned#');
 
-        $runtime = new Runtime();
+        $runtime = new Runtime(LOCATION);
         $future  = $runtime->run(static function (): string {
             /** @phpstan-ignore-next-line */
             return 1;

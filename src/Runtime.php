@@ -9,6 +9,7 @@ use parallel\Future;
 use parallel\Runtime as ParallelRuntime;
 
 use function func_get_args;
+use function is_array;
 
 final class Runtime
 {
@@ -32,10 +33,18 @@ final class Runtime
      */
     public function run(Closure $task, ?array $argv = null): ?Future
     {
+        $arguments   = [];
+        $arguments[] = $this->wrapClosure($task);
+        if (is_array($argv)) {
+            $arguments[] = $argv;
+        }
+
         /**
+         * @phpstan-ignore-next-line
+         * @psalm-suppress PossiblyInvalidArgument
          * @psalm-suppress PossiblyNullArgument
          */
-        return $this->runtime->run(...func_get_args());
+        return $this->runtime->run(...$arguments);
     }
 
     public function close(): void
@@ -46,5 +55,10 @@ final class Runtime
     public function kill(): void
     {
         $this->runtime->kill();
+    }
+
+    private function wrapClosure(Closure $task): Closure
+    {
+        return static fn (?array $argv = null): Outcome => TaskRunner::run($task, $argv);
     }
 }
