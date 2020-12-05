@@ -44,7 +44,7 @@ $outcome = $future->value();
 echo get_class($outcome), PHP_EOL; // WyriHaximus\Parallel\Outcome
 echo $outcome->result(), PHP_EOL; // yay
 foreach ($outcome->errors() as $error) {
-    echo $error[1], PHP_EOL; // Error! Error! Error!
+    echo $error->message(), PHP_EOL; // Error! Error! Error!
 }
 ```
 

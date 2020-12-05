@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WyriHaximus\Tests\Parallel;
 
+use WyriHaximus\Parallel\Error;
 use WyriHaximus\Parallel\Outcome;
 use WyriHaximus\TestUtilities\TestCase;
 
@@ -28,10 +29,11 @@ final class OutcomeTest extends TestCase
      */
     public function error(): void
     {
+        $error            = new Error(100, 'ow noes!', __FILE__, __LINE__);
         $outcome          = new Outcome();
-        $outcomeWithError = $outcome->withError(['ow noes!']);
+        $outcomeWithError = $outcome->withError($error);
 
         self::assertNotSame($outcome, $outcomeWithError);
-        self::assertSame([['ow noes!']], iterator_to_array($outcomeWithError->errors())); /** @phpstan-ignore-line */
+        self::assertSame([$error], iterator_to_array($outcomeWithError->errors())); /** @phpstan-ignore-line */
     }
 }

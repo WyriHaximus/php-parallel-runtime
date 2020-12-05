@@ -39,6 +39,6 @@ final class TaskRunnerTest extends TestCase
         self::assertTrue($outcome->result());
         $errors = iterator_to_array($outcome->errors()); /** @phpstan-ignore-line */
         self::assertCount(1, $errors);
-        self::assertSame('fire', $errors[0][1]);
+        self::assertSame('fire', $errors[0]->message());
     }
 }
