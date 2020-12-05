@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "php": "^8 || ^7.4",
+    "php": "^7.4",
     "ext-parallel": "^1"
   },
   "require-dev": {
