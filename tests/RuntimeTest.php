@@ -14,9 +14,13 @@ use WyriHaximus\Parallel\Outcome;
 use WyriHaximus\Parallel\Runtime;
 
 use function iterator_to_array;
+use function pcntl_signal;
+use function posix_getpid;
+use function Safe\posix_kill;
 use function Safe\sleep;
 use function trigger_error;
 
+use const SIGUSR1;
 use const WyriHaximus\Constants\ComposerAutoloader\LOCATION;
 
 final class RuntimeTest extends AsyncTestCase
@@ -121,5 +125,42 @@ final class RuntimeTest extends AsyncTestCase
         self::assertSame('yay', $outcome->result());
         $errors = iterator_to_array($outcome->errors()); /** @phpstan-ignore-line */
         self::assertCount(1, $errors);
+    }
+
+    /**
+     * @test
+     */
+    public function signal(): void
+    {
+        pcntl_signal(SIGUSR1, static function (): void {
+        });
+        $runtime = new Runtime(LOCATION);
+        for ($i = 0; $i < 29; $i++) {
+            $runtime->run(static function (): string {
+                sleep(3);
+
+                return 'yay';
+            });
+        }
+
+        $future = $runtime->run(static function (): string {
+            return 'yay';
+        });
+
+        sleep(1);
+
+        for ($i = 0; $i < 6; $i++) {
+            posix_kill(posix_getpid(), SIGUSR1);
+        }
+
+        self::assertInstanceOf(Future::class, $future);
+        $outcome = $future->value();
+        self::assertInstanceOf(Outcome::class, $outcome);
+        self::assertSame('yay', $outcome->result());
+        $signals = iterator_to_array($outcome->signals()); /** @phpstan-ignore-line */
+        self::assertGreaterThanOrEqual(1, $signals);
+        foreach ($signals as $signal) {
+            self::assertSame(SIGUSR1, $signal->signal());
+        }
     }
 }
