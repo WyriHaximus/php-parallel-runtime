@@ -12,6 +12,9 @@ final class Outcome
     /** @var array<Error> */
     private array $errors = [];
 
+    /** @var array<Signal> */
+    private array $signals = [];
+
     /**
      * @param mixed $result
      */
@@ -45,5 +48,21 @@ final class Outcome
     public function errors(): iterable
     {
         yield from $this->errors;
+    }
+
+    public function withSignal(Signal $signal): Outcome
+    {
+        $clone            = clone $this;
+        $clone->signals[] = $signal;
+
+        return $clone;
+    }
+
+    /**
+     * @return iterable<Signal>
+     */
+    public function signals(): iterable
+    {
+        yield from $this->signals;
     }
 }

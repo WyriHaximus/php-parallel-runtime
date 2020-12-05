@@ -40,11 +40,15 @@ $future  = $runtime->run(static function (): string {
 
     return 'yay';
 });
+posix_kill(posix_getpid(), SIGUSR1);
 $outcome = $future->value();
 echo get_class($outcome), PHP_EOL; // WyriHaximus\Parallel\Outcome
 echo $outcome->result(), PHP_EOL; // yay
 foreach ($outcome->errors() as $error) {
     echo $error->message(), PHP_EOL; // Error! Error! Error!
+}
+foreach ($outcome->signals() as $signal) {
+    echo $signal->signal(), PHP_EOL; // SIGUSR1
 }
 ```
 

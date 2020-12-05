@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "372693ca84d841fb512cb1e2245fa1ca",
+    "content-hash": "35e8e7ebf63d1fcecbc168301cba8c1f",
     "packages": [
         {
             "name": "wyrihaximus/constants",
@@ -8304,7 +8304,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^7.4",
-        "ext-parallel": "^1"
+        "ext-parallel": "^1",
+        "ext-pcntl": "^7.4"
     },
     "platform-dev": [],
     "platform-overrides": {
